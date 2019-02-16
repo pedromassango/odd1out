@@ -5,6 +5,7 @@ import 'package:odd1out/challenge.dart';
 
 class Games{
 
+  Random random = Random();
   var lastIndex = 0;
   final List<Challenge> games = [
     Challenge('0', 'O'),
@@ -25,7 +26,7 @@ class Games{
   ];
 
   Challenge getRandomChallenge(){
-    var i = Random().nextInt(games.length);
+    var i = random.nextInt(games.length);
 
     // prevent to generate the same game consecutively
     if(i == lastIndex){
