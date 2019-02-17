@@ -1,6 +1,11 @@
-# odd1out
+# Odd1Out
+A Flutter game app
+Goal: To pick the one letter that’s mismatched amongst the other letters. After each level ends, the letters and colors would keep changing, just to have a difficult time reading it.
 
-A new Flutter project.
+![Screeshot](shots/odd.png)
+
+## Game concept from Project365
+https://project365.design/2018/10/04/day-277-odd1out-fun-game-concept/
 
 ## Getting Started
 
