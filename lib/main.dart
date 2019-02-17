@@ -25,6 +25,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  int points = 0;
   int totalElements = 100;
   bool isGameRunning;
   Challenge challenge;
@@ -37,14 +38,17 @@ class _MyHomePageState extends State<MyHomePage> {
     challenge = Games().getRandomChallenge();
   }
 
+  void restartGame(){
+    points = 0;
+    generateGame();
+  }
+
 
   bool generated = false;
   int lastOddPosition;
   String getGameItem(int index) {
     var r = random.nextInt(totalElements);
     var result = challenge.common;
-
-    print('First IF> $index & $r');
 
     if (index == r && generated == false) {
       if(lastOddPosition == r) {
@@ -53,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         result = challenge.odd;
       generated = true;
       lastOddPosition = r;
-    } else if(index == totalElements-1 && generated == false){
+    } else if(index == totalElements && generated == false){
       if(lastOddPosition == r) {
         return getGameItem(index);
       }
@@ -64,6 +68,50 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
     return result;
+  }
+
+  onItemClick(int i){
+    if(i == lastOddPosition){
+      // winner
+      setState(() {
+        points += 1;
+        generateGame();
+      });
+    }else{
+      // loser
+      if(points == 0){
+        showDialog(
+            context: context,
+          builder: (BuildContext context){
+              return AlertDialog(
+                title: Text('End of the Game :('),
+                content: Text('You\'ve lost all your points, keep hitting to stay in the game!'),
+                actions: <Widget>[
+                  FlatButton(
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                      },
+                      child: Text("Close".toUpperCase())),
+                  FlatButton(
+                      onPressed: (){
+                        setState(() {
+                          Navigator.of(context).pop();
+                          restartGame();
+                        });
+                      },
+                      child: Text("RESTART"))
+                ],
+              );
+          }
+        );
+        return;
+      }
+
+      setState(() {
+        points -= 2;
+        generateGame();
+      });
+    }
   }
 
   @override
@@ -83,29 +131,49 @@ class _MyHomePageState extends State<MyHomePage> {
          mainAxisSize: MainAxisSize.max,
          crossAxisAlignment: CrossAxisAlignment.center,
          children: <Widget>[
-           Text("Pick the Odd One Out!"),
+           Text("Pick the Odd One Out!\n ${points == 0 ? '': points}",
+             textAlign: TextAlign.center,
+             style: TextStyle(
+             color: Colors.grey,
+             fontSize: 18
+           ),),
            Spacer(),
            GridView.count(
              crossAxisCount: 10,
              shrinkWrap: true,
              physics: NeverScrollableScrollPhysics(),
              children: List.generate(totalElements, (i){
-               return Text(
-                 getGameItem(i),
-                 style: TextStyle(color: Colors.black,
-                   fontSize: 32
+               return InkWell(
+                 onTap: (){
+                   onItemClick(i);
+                 },
+                 child: Center(
+                   child: Text(
+                     getGameItem(i),
+                     style: TextStyle(color: Colors.black,
+                       fontSize: 26
+                     ),
+                   ),
                  ),
                );
              }),
            ),
            Spacer(),
            GestureDetector(
-             onTap: (){
-               setState(() {
-                 generateGame();
-               });
-             },
-               child: Text('Skip Round', style: TextStyle(color: Colors.deepOrange),)),
+               onTap: () {
+                 setState(() {
+                   generateGame();
+                 });
+               },
+               child: Container(
+                 height: 40,
+                 width: 100,
+                 child: Center(
+                   child: Text(
+                     'Skip Round', style: TextStyle(color: Colors.deepOrange),
+                   ),
+                 ),
+               ),),
          ],
        ),
      ),
